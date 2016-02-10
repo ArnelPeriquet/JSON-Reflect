@@ -1,0 +1,538 @@
+{\rtf1\ansi\ansicpg1252\deff0{\fonttbl{\f0\fnil\fcharset0 Arial;}{\f1\fnil\fcharset0 Courier New;}{\f2\fnil\fcharset0 Consolas;}{\f3\fnil Consolas;}{\f4\fnil\fcharset2 Symbol;}}
+{\colortbl ;\red0\green0\blue255;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\generator Msftedit 5.41.21.2510;}\viewkind4\uc1\pard\qc\lang1033\b\fs32 USER GUIDE - C++ JSON Reflect\b0\par
+\i\fs24 JSON-Based Runtime Reflection for C++\i0\fs32\par
+\pard\par
+\pard\qc\fs22 Arnel I Periquet\par
+\par
+01-07-2015\par
+\pard\par
+\par
+\b OUTLINE\b0\par
+\par
+\pard\tx360 I.\tab INTRODUCTION\par
+\par
+\tab A. Motivation\par
+\par
+\tab B. Packages and Name Spaces\par
+\par
+\tab C. Third Party Dependencies\par
+\par
+II.\tab DATA TYPES\par
+\par
+\tab A. Type and DataType\par
+\par
+\tab B. Simple Data Types\par
+\pard\par
+\pard\tx360\tab C. Simple Arrays\par
+\pard\par
+\pard\tx360\tab D. Object Arrays\par
+\pard\par
+\pard\tx360 III.\tab USER DEFINED CLASSES\par
+\par
+\tab A. Class, Object and ClassModel\par
+\par
+\tab B. Class Attribute\par
+\par
+\tab C. Class Instantiation\par
+\par
+\tab D. ClassLoader, ClassStore and JSON Encoded Class Schemas\par
+\par
+IV.\tab ENCODINGS\par
+\par
+\tab A. JSON Encoding\par
+\pard\par
+\pard\tx360\tab B. XML Encoding\par
+\par
+\par
+APPENDIX A. WINDOWS INSTALLATION\par
+\par
+APPENDIX B. LINUX INSTALLATION\par
+\par
+\par
+\pard\par
+\pard\fi-360\li360\b I.\tab INTRODUCTION\par
+\pard\b0\par
+A. Motivation\par
+\par
+\fs20 C++ JSON Reflect provides a reflection toolkit for C++ and a class schema representation based on the JavaScript Object Notation (JSON). The toolkit embeds a JSON-based type system into C++ programs that forms the basis for a meta-object protocol (MOP) to maniuplate objects and their classes at run-time. The libraries build on this type system to provide a JSON encoding for marshaling classes from/to an input or output stream. A ClassLoader is provided for loading classes from the file system, also allowing for loading classes from the network.\fs22\par
+\fs20\par
+\i Benefits\i0\par
+\pard\li360\par
+\pard{\pntext\f4\'B7\tab}{\*\pn\pnlvlblt\pnf4\pnindent0{\pntxtb\'B7}}\fi-360\li1080 C++ embedded type system and run-time reflection API\par
+{\pntext\f4\'B7\tab}Object API for JSON parsing and generation (JSON.Stringify(), JSON.Parse())\par
+{\pntext\f4\'B7\tab}Object API for generating XML (XML.Stringify())\par
+{\pntext\f4\'B7\tab}JSON-based Class schema and ClassLoader\par
+\pard\par
+\fs22\par
+B. Packages and Name Spaces\par
+\par
+\fs20 The toolkit is packaged into four DLLs, layered as follows:\par
+\tab\tab\f1\par
+\tab encoding.dll\tab encoding_xml.dll\par
+\tab\tab    \\\tab      /\par
+\tab\tab   modeling.dll\f0\par
+\par
+The following name spaces are defined by the toolkit and are structured with corresponding file system directories:\par
+\par
+\pard\li720\f1 webo::modeling\tab\tab\tab - \f0 reflection API\f1\par
+webo::modeling::datatype\tab - \f0 datatypes defined by the toolkit\f1\par
+webo::encoding\tab\tab\tab - \f0 JSON and schema encoding and decoding\f1\par
+webo::encoding_xml\tab\tab - \f0 XML encoding\fs22\par
+\pard\par
+\par
+C. Third Party Dependencies\par
+\par
+\fs20 The toolkit uses standard C++ and does not hold any dependencies other than the Boost libraries. Individual components may not have any third party dependencies at all. For example, the modeling library may be built without installing Boost:\par
+\par
+\tab modelling.dll\tab\tab - no third party dependencies\par
+\tab encoding.dll\tab\tab - boost header dependency for JSON parsing\par
+\tab encoding_xml.dll\tab - boost header dependency for XML parsing\fs22\par
+\par
+\par
+\pard\fi-360\li360\b II.\tab DATA TYPES\b0\par
+\pard\par
+A. Type and DataType\par
+\par
+\fs20 All types in the toolkit derive from \f1 webo::modeling::Type\f0  and have a \f1 name \f0 and \f1 nameSpace \f0 which defaults to the \f1 default \f0 name space.\f1\par
+\par
+\f0 All built-in data types in the toolkit derive from \f1 webo::modeling::datatype::Datatype\f0 , which itself is a direct descendent of \f1 Type\f0 .\par
+\par
+User defined instances of \f1 webo::modeling::Class\f0  are also supported. \f1 Class\f0  is also a \f1 Type\f0 .\par
+\par
+This is illustrated as follows:\par
+\par
+\tab\tab\b\f1 Type\b0\f0\par
+\tab\tab   |\par
+\tab\tab   | <<is a>>\par
+\tab\tab   -------------------------------------------------------------\par
+\tab\tab   |\tab\tab\tab\tab\tab   |\par
+\tab\tab\b\f1 DataType\b0\f0      \tab\tab\tab\tab\b\f1 Class\b0\f0\par
+\tab\tab   |\tab\tab\tab\tab\tab      \\\\\par
+\tab\tab   | <<is a>>\tab\tab\tab\tab       \\\\  <<instance of>>\par
+\tab\tab   ------------------------------------------\tab   -------------------------\par
+\tab\tab   |\tab\tab  |\tab        |\tab\tab    \\\\\tab\tab    \\\\\par
+\tab\tab   |\tab\tab  |\tab        |\tab\tab   \f1 UserClass1\f0\tab   \f1 UserClass2\f0\par
+\tab\tab\b\f1 tCharacter\b0\f0   \b\f1 tBoolean\b0\f0     \b\f1 ...\b0\f0\par
+\tab\tab     \\\\\tab   \par
+\tab\tab      \\\\ << instance of>>\par
+\tab\tab   \f1 tCharacter::Instance()\f0\par
+  \par
+\par
+\f1 Type\f0 s are prefaced with the character 't' to prevent conflicts with symbols defined by the host langauge or its commonly used libraries. For example, \f1 String\f0  is likely to be a commonly defined symbol; so, we use \f1 tString\f0  as our type name.\par
+\fs22\par
+\par
+B. Simple Data Types\par
+\par
+\fs20 The following simple data types are built-in: \f1 tCharacter,\f0  \f1 tBoolean\f0 , \f1 tInteger,\f0  \f1 tFloat,\f0  \f1 tString\f0  and \f1 tNull\f0 . These types correspond to the full set of JSON supported types, with a few deviations. \f1 tCharacter\f0  converts to/from JSON \f1 string\f0  to directly represent the C++ \f1 char\f0  type. \f1 tInteger\f0  and \f1 tFloat\f0  convert to/from JSON \f1 number\f0  to directly represent the C++ \f1 int\f0  and \f1 double\f0  types.\par
+\par
+All simple data types come with two methods:\par
+\par
+\pard\li720\f1 instance() - \f0 factory method for the corresponding singleton class\par
+\f1 value(<value>) - \f0 creates an instance using the given value\par
+\pard\li360\par
+\pard For example, the following would declare and create an instance of \f1 tInteger\f0 :\par
+\par
+\tab\f1 shared_ptr<Object> aNumber = tInteger::value(5);\f0\par
+\par
+And, the following assertion would hold true:\par
+\par
+\tab\f1 assert( aNumber.type == tInteger::instance() )\f0\par
+\par
+\par
+\fs22 C. Simple Arrays\par
+\fs20\par
+The \f1 tArray<>\f0  templated data type supports simple base types, i.e., \f1 tArray<tCharacter>\f0 , \f1 tArray<tBoolean>\f0 , \f1 tArray\f0 <\f1 tString>\f0 ,\f1  tArray\f0 <\f1 tInteger> \f0 or\f1  tArray<tNull>\f0 . The reflection API requires all objects to have a \f1 type\f0 , and arrays to have a fixed length and single base \f1 type\f0 ; unlike JSON, arrays are homogeneous. Also, multi-dimensional arrays are not currently supported.\par
+\par
+As with simple data types, \f1 tArray<>\f0  comes with an \f1 instance()\f0  method and various \f1 value()\f0  methods for creating reflection types using native C++ arrays:\par
+\par
+\pard\li720\f1 instance() - \f0 factory method  for referencing the corresponding singleton class\par
+\f1 value() - \f0 create an empty array\par
+\f1 value(size_tlength) \f0 - create array with defaults values\par
+\f1 value(char[], size_tlength) - \f0 create initialized character array\par
+\f1 value(int[], size_tlength) - \f0 creates initialized integer array\par
+\f1 value(string[], size_tlength) - \f0 creates initialized string array\par
+\f1 value(bool[], size_tlength) - \f0 creates initialized boolean array\par
+\pard\par
+Default values are as follows : tCharacter(0), tInteger(0), tString(""), tBoolean(false).\par
+\par
+For example, the following would declare and create an instances of \f1 tArray \f0 with base type \f1 tInteger\f0 :\par
+\par
+\cf1\highlight2\f2\fs19\tab\cf0\f1\fs20 int integers[] = \{ 1, 2, 3 \};\highlight0\f0\par
+\tab\f1 shared_ptr<Object> arr1 = tArray<tInteger>::value(\highlight2 integers, \highlight0 3);\par
+\tab shared_ptr<Object> arr2 = tArray<tInteger>::value(1);\tab\f0\par
+\par
+And, the following assertions would hold true:\par
+\par
+\tab\f1 assert( arr1.type == tArray<tInteger>::instance() );\par
+\tab assert( arr1[0] == tInteger::value(1) );\par
+\tab assert( arr1[1] == tInteger::value(2) );\par
+\tab assert( arr1[2] == tInteger::value(3) );\par
+\f0\tab\f1 assert( arr2.type == tArray<tInteger>::instance() );\par
+\tab assert( arr2[0] == tInteger::value(0) ); // default value\f0\par
+  \par
+Be aware that as with the C/C++ language, array access with out-of-bounds indexes are not checked. In particular, constructing an array that has a larger size than the native array argument may not result in an explicit error, but would result in corrupted data. Similarly, access to out-of-bounds indexes of an array object may not result in an explicit error, but would result in invalid return data.\par
+\par
+The following provides an example of looping over a simply array:\par
+\pard\li720\f1\par
+std::shared_ptr<Object> *nativeArr = arr1->asArray<tInteger>();\par
+\par
+for (size_t i=0; i<arr1->getArrayLength(); i++) \{\tab\par
+\pard\li720\tx1080\tab assert( nativeArr[i]->type == tInteger::instance() );\par
+\pard\tab\}\f0\par
+\par
+\par
+\fs22 C. Object Arrays\f1\par
+\f0\fs20\par
+The \f1 tObjectArray\f0  data type supports a base type of any user defined class. The reflection API requires all objects to have a \f1 type\f0 , and arrays to have a fixed length and single base \f1 type\f0 ; unlike JSON, arrays are homogeneous. Also, multi-dimensional arrays are not currently supported.\par
+\par
+\f1 tObjectArray<>\f0  comes with an \f1 instance()\f0  method and a three \f1 value()\f0  methods:\par
+\par
+\pard\li720\f1 instance() - \f0 factory method  for referencing the corresponding singleton class\par
+\f1 value(Class & baseType) - \f0 creates an empty array\par
+\f1 value(Class & baseType, size_t length) - \f0 create array with defaults values\par
+\f1 value(Class & baseType, std::shared_ptr<Object> arr[], size_t length) - \f0 create initialized array\par
+\pard\par
+For example, the following would declare and create an instance of \f1 tObjectArray \f0 with base type \f1 MyClass\f0 :\par
+\par
+\tab\f1 Class c("MyClass");\f0\par
+\tab\f1 shared_ptr<Object> arr = tObjectArray::value(c, 2);\f0\par
+\par
+And, the following assertions would hold true:\par
+\par
+\tab\f1 assert( arr.type == tObjectArray::instance(c) );\par
+\tab assert( arr[1]->type == c );\f0\par
+\par
+Be aware that as with the C/C++ language, array access with out-of-bounds indexes are not checked. In particular, constructing an array that has a larger size than the native array argument may not result in an explicit error, but would result in corrupted data. Similarly, access to out-of-bounds indexes of an array object may not result in an explicit error, but would result in invalid return data.\par
+\par
+The following provides an example of looping over an object array:\par
+\pard\li720\f1\par
+std::shared_ptr<Object> * nativeArr = arr->asObjectArray(c);\par
+\par
+for (size_t i = 0; i < arr->getObjectArrayLength(); i++) \{\tab\par
+\pard\li720\tx1080\tab assert( nativeArr[i]->type == c );\par
+\}\f0\par
+\pard\fs22\par
+\par
+\pard\fi-360\li360\b II.\tab USER DEFINED CLASSES\b0\par
+\pard\par
+A. Class, Object and ClassModel\par
+\par
+\fs20 The toolkit allows you to define your own classes by instantiating the \f1 Class \f0 class.\par
+\par
+The concepts define a meta-hierachy that is embedded in a host language, i.e. C++. This can be a point of confusion since the embedded meta-hierarchy is defined in terms of the host language meta-hierarchy. The correspondence is as follows:\par
+\par
+\pard{\pntext\f4\'B7\tab}{\*\pn\pnlvlblt\pnf4\pnindent0{\pntxtb\'B7}}\fi-360\li1080 The singleton metaclass, called "Class", is defined as a C++ Class.\par
+{\pntext\f4\'B7\tab}User defined classes are defined as C++ objects that instantiate the "Class" class.\par
+{\pntext\f4\'B7\tab}Instances of user defined classes are represented by instances of  the "Object" class.\par
+\pard\par
+The C++ Programming Language does not define a mechanism for dynamic (run-time) class creation. Within C++, an example meta-hierarchy correspondence would be as follows:\par
+\par
+\tab metaclass "Class"\tab ------------>\tab C++ Class\par
+\tab user class "MyClass"\tab ------------>\tab C++ instance of "Class"\par
+\tab instance of "MyClass"\tab ------------>\tab C++ instance of "Object"\par
+\par
+The toolkit provides a factory class called \f1 ClassModel\f0 , for creating and storing a context of defined classes. Although, classes do not have to be defined as part of a \f1 ClassModel\f0 , the class model context provides checks for unique class names. However, any duplicate named classes outside and across ClassModel instances would not be detected as a different class, and would pass the equality test even if they contained different attributes.\par
+\par
+\par
+\i Object Equality\i0\par
+\par
+Three forms of equality checking are available for simple types, as shown in the following examples:\par
+\par
+\highlight2\f1\tab assert( *tString::value("test1") == *tString::value("test1") );\par
+    \tab assert( tString::value("test1")->Equals(tString::value("test1")));\par
+    \tab assert( tString::value("test1")->AsString() == "test1" );\cf3\f3\fs19\par
+\cf0\highlight0\f0\fs20\par
+In contrast, equality checking of instances of user-defined classes compares by identity and does not perform a deep comparison of attributes.\par
+\par
+\par
+\fs22 B. Class Attribute\fs20\par
+\par
+Any number of attributes may be added to a user defined class using the \f1 addAttribute()\f0  method which takes as parameters, a \f1 name \f0 for the attribute and a \f1 type\f0 . The type may be any built in data type or user defined class.\par
+\par
+For example, the following would define a user class named \f1 MyClass\f0  with two attributes of the simple types \f1 tInteger \f0 and \f1 tCharacter\f0 :\tab\par
+\par
+\f1\tab Class c("MyClass");\par
+\tab c.addAttribute("var1", tInteger::instance());\par
+\tab c.addAttribute("var2", tArray<tCharacter>::instance());\par
+\par
+\f0 And, the following would add another attribute with a \f1 type\f0  defined by a user defined class:\f1\par
+\par
+\tab // define a new class\par
+\tab Class c2("MyClass2");\par
+\tab c2.addAttribute("a", tString::instance());\par
+\par
+\tab // store a new attribute with type of the new class\par
+\tab c.addAttribute("var3", c2);\par
+\tab\par
+\f0 Here is how you would instantiate the object and set values on all its attributes:\f1\par
+\par
+\tab Object o(c);\par
+\tab o.set("var1", tInteger::value(42));\par
+\tab o.set("var2", tArray<tCharacter>::value(3));\par
+\tab o.get("var3")->set("a", tCharacter::value('z'));\par
+\tab\f0\fs22\par
+\fs20 Attributes can be dynamically added to a class even after an object of that class has been instantiated. For example, the object \f1 o\f0  defined above would have a new accessible attribute even after having instatiated it:\fs22\par
+\f1\fs20\par
+\tab c.addAttribute("var4", tCharacter::instance());\tab\par
+\tab o.set("var4", tCharacter::value('z'));\f0\par
+\fs22\par
+\par
+C. Class Instantiation\par
+\par
+\i\fs20 Instance of User Defined Class\i0\par
+\par
+When an object is an instance of a user defined class, its attribute values may be accessed using the \f1 get()\f0  and \f1 set()\f0  methods. \f1 Object \f0 attribute values are stored as \f1 std::shared_ptr<Object>. \f0 When an attribute is added, it is initially null. On the first \f1 get()\f0  call, the attribute is instantiated, except for attributes of type \f1 tArray<>\f0  or \f1 tObjectArray\f0  since their desired size is not known. Elements of an array type attribute must be set before being accessed or their value will be null.\par
+\par
+To check if an object's attribute has been initialized to a value, use the following method:\par
+\par
+\tab\f1 bool hasValue(std::string name)\f0\par
+\par
+To check if an object is set to a \f1 tNull \f0 value, use the following method:\par
+\par
+\tab\f1 bool isNull()\f0\par
+\par
+\par
+\i Instance of Built In Data Type\i0\par
+\par
+When an object is an instance of a built in data type, its value would be accessed using one of the following methods: \par
+\par
+\pard\li720\f1 std::string asString()\par
+char asCharacter()\par
+int asInteger()\par
+bool asBoolean()\par
+\par
+\pard\f0 Corresponding methods are used to store values of simple built-in types into an existing object:\par
+\par
+\pard\li720\f1 asString(std::string)\par
+asCharacter(char)\par
+asInteger(int)\par
+\pard\tab asBoolean(bool)\par
+\pard\li720\par
+\pard\f0 For array types, the object must be converted to a native C/C++ array for access to its elements using the [] operator:\f1\par
+\pard\li720\par
+template <typename T> std::shared_ptr<Object> * asArray()\par
+std::shared_ptr<Object> * asObjectArray(Class & baseType)\f0\par
+\pard\par
+\par
+\i Instance of Simple Array\i0\par
+\par
+When an object is an instance of a simple array, its element values would be accessed by first converting the objecto a native C/C++ array and then using the [] operator. Array elements are initialized with default objects at creation time. The elements may be replaced with new objects if so desired.\par
+\par
+For example, the following would get and set a value on an array object element and then replace an element of the array with a new object:\par
+\par
+\f1\tab std::shared_ptr<Object> arr= tArray<tBoolean>::value(2);\par
+\tab std::shared_ptr<Object> myBool = arr->asArray<tBoolean>()[1];\par
+\tab arr->asArray<tBoolean>()[0]->asBoolean(true);//replace value\par
+\tab arr->asArray<tBoolean>()[0]=tBoolean::value(true);//replace object\f0\par
+\par
+\par
+\i Instance of Object Array\i0\par
+\par
+When an object is an instance of an object array, its element values would be accessed by first converting the object to a native C/C++ array and then using the [] operator. Array elements are initialized with default objects at creation time. The elements may be replaced with new objects if so desired.\par
+\par
+For example, the following would get and set a value on an object array:\fs22\par
+\par
+\highlight2\f1\fs20\tab Class c("MyClass");\par
+\tab c.addAttribute("attr", tInteger::instance());\par
+      std::shared_ptr<Object> arr = tObjectArray::value(c, 1);\par
+\tab std::shared_ptr<Object> myObj = arr->asObjectArray(c)[0];\par
+\par
+\tab //replace value\par
+\tab arr->asObjectArray(c)[0].set("attr", tInteger::value(5));\par
+\par
+\tab //replace object\par
+\tab std::shared_ptr<Object> object = std::make_shared<Object>(c);\par
+\tab object->set("attr",tInteger::value(5));\par
+\tab arr->asObjectArray(c)[0] = object; \highlight0\f0\fs22\par
+\par
+\par
+D. ClassLoader, ClassStore and JSON Encoded Class Schemas\par
+\par
+\fs20 The toolkit provides a mechanism for storing and loading classes from the file system. The class \f1 webo.encoding.ClassLoader\f0  extends \f1 webo.modeling.ClassModel\f0  to override the \f1 getClass()\f0  method so that upon failure to find the class, an attempt is made to load the class from disc.\par
+\par
+The \f1 ClassLoader\f0  uses class \f1 webo.encoding.ClassStore\f0  to store and retrieve a class from disc. Users would extend the interface to provide a different implementation and install it on the \f1 ClassLoader\f0 , for example, to load classes over the Internet. The following \f1 ClassLoader\f0  constructor takes a custom \f1 ClassStore\f0  as an optional parameter:\par
+\par
+\highlight2\f1\tab ClassLoader(std::string rootPath, ClassStore * store = nullptr)\highlight0\f0\par
+\par
+Absent the custom parameter, an internal \f1 ClassStore\f0  would load classes from the disc. \par
+\par
+The \f1 JSON\f0  class supports a mechanism for creating and decoding a class schema from/to a \f1 Class\f0  object. The proprietary schema format is referred to as JavaScript Schema Notation (JSSN), pronounced 'jazzin'. This schema format is independent from proposed standards for JSON Schema, and is used for encoding classes within this toolkit. The following methods are provided on the \f1 JSON\f0  class (described more fully in a separate section):\par
+\par
+\highlight2\f1\tab std::string stringifySchema(modeling::Class & clazz)\par
+\tab void parseSchema(std::string & jssnString)\highlight0\par
+\f0\par
+The following provides an example of how to use these facilities:\par
+\par
+\pard\li720\highlight2\f1 ClassModel cm;\par
+Class & c = cm.createClass("MyClass", "this.that.other");\par
+c.addAttribute("attr", tString::instance());\par
+\par
+JSON json(cm);\par
+std::string schema = json.stringifySchema(c);\par
+ClassStore cs("c:/test");\par
+cs.store("MyClass", schema, "this.that.other");\par
+\par
+ClassLoader cl("c:/test");\par
+Class & c = cl.getClass("MyClass", "this.that.other");\par
+Object o(c);\highlight0\f0\fs22\par
+\pard\par
+\fs20 We start by creating a new class \f1 MyClass\f0  in the package \f1 this.that.other\f0 . An attribute is also added to the class.\par
+\par
+We demonstrate the encoding of the class into JSON and the use of \f1 ClassStore\f0  to store the encoding to disc. This code is independent of the \f1 ClassLoader\f0  and allows us to create a test class schema on disc that the \f1 ClassLoader\f0  can load. First, the \f1 JSON\f0  class is used to create the schema from the class. Then, an instance of \f1 ClassStore\f0  is created with a root location of \f1 c:/test\f0 . It is used to store the schema for \f1 MyClass\f0  to the file system. This results in the following path and file being created with the schema contents:\par
+\par
+\f1\tab c:/test/this/that/other/MyClass\f0\par
+\par
+Finally, an instance of \f1 ClassLoader\f0  is created, also with a root location of \f1 c:/test\f0 . It is used to retrieve the class \f1 MyClass\f0  from the file system. Given a set of stored class schemas on the file system, this last code block is all that would be needed to retrieve stored classes and begin creating objects from them.\par
+\fs22\par
+\par
+\pard\tx360\b III.\tab ENCODINGS\b0\par
+\pard\i\fs20\par
+\i0\fs22 A. JSON Encoding\par
+\par
+\i\fs20 Encoding to JSON\i0\par
+\par
+The toolkit provides a facility for encoding an instance of a user defined class to JSON. The class \f1 webo::encoding::JSON\f0  provides the desired function. The \f1 stringify() \f0 method accepts an \f1 Object \f0 and a corresponding \f1 Type \f0 as parameters and returns a JSON string. As discussed previously, an \f1 Object\f0  consists of a set of attributes and attributes values. Those attributes may be objects, arrays or other simple types. Note that different classes containing matching attributes may be used to encode or decode to the same JSON.\par
+\par
+The \f1 JSON \f0 object is instantiated using a \f1 ClassModel\f0  reference that would resolve any of the \f1 Type\f0 s referenced by the inner structure of the object parameter. For example, the following defines an object with various attributes and converts it to JSON:\par
+\par
+\f1\tab ClassModel cm;\par
+\tab Class & c1 = cm.createClass("MyClass");\par
+\tab Class & c2 = cm.createClass("MyClass2");\par
+\tab c2.addAttribute("attr1", tInteger::instance());\par
+\tab c2.addAttribute("attr2", tString::instance());\par
+\tab c1.addAttribute("attr1", c2);\par
+\tab c1.addAttribute("attr2", tCharacter::instance());\tab\par
+\par
+\tab\highlight2 std::shared_ptr<Object> obj1 = std::make_shared<Object>(c1);\par
+    \tab std::shared_ptr<Object> obj2 = obj1->get("attr1");\par
+    \tab obj2->set("attr1", tInteger::value(5));\par
+    \tab obj2->set("attr2", tString::value("hello"));\par
+    \tab obj1->set("attr2", tCharacter::value('-'));\par
+\highlight0\par
+\tab JSON json(cm);\par
+\tab std::string result = json.stringify(obj, c1);\f0\par
+\par
+The value of result would be:\par
+\par
+\pard\li720\f1\{\par
+   "attr1" :\par
+      \{\par
+         "attr1" : 5,\par
+         "attr2" : "hello"\par
+      \},\par
+   "attr2" : "-"\par
+\}\f0\par
+\pard\par
+\par
+\i Decoding from JSON\i0\par
+\par
+The toolkit provides a facility for decoding a JSON string into an instance of a user defined class. The class \f1 webo::encoding::JSON\f0  provides the desired function. The \f1 parse() \f0 method accepts a \f1 std::string \f0 containing valid JSON and a corresponding \f1 Class \f0 as parameters  and returns \f1 std::shared_ptr<Object>\f0  as an instance of the corresponding user defined class.\par
+\par
+The \f1 JSON \f0 object is instantiated using a \f1 ClassModel \f0 reference that would resolve any of the \f1 Type\f0 s referenced by the inner structure of the JSON string being decoded. For example, continuing the example from above, the following would decode the result string back into an object:\par
+\par
+\f1\tab std::shared_ptr<Object> obj3 = json.parse(result, c1);\par
+\tab assert( obj3->type == c1 );\par
+\tab assert( obj3->get("attr1")->type == c2 );\par
+\tab assert( obj3->get("attr1")->get("attr1")->asInteger() == 5 );\par
+\tab assert( obj3->get("attr1")->get("attr2")->asString() =="hello" );\par
+\tab assert( obj3->get("attr2")->asCharacter() == '-' );\f0\par
+\fs22\par
+\par
+B. XML Encoding\par
+\par
+\i\fs20 Encoding to XML\i0\par
+\par
+The toolkit provides a facility for encoding an instance of a user defined class to XML. The class \f1 webo::encoding_xml::XML\f0  provides the desired function. The \f1 stringify() \f0 method accepts an \f1 Object \f0 and a corresponding \f1 Type \f0 as parameters and returns a XML string. As discussed previously, an object consists of a set of attributes and attributes values. All basic types are converted to plain text when used as content for an XML Element or as quoted text when used as an XML Attribute value; \f1 tBoolean\f0  converts \f1 to "true"\f0  or \f1 "false"\f0 , and \f1 tNull\f0  converts to \f1 "null"\f0 . \par
+\par
+A step wise example of how to encode XML from an \f1 Object\f0  follows.\par
+\par
+1. Use the following include files and namespaces\par
+\par
+\f1\tab #include "webo/encoding_xml/XML.h"\par
+\tab #include "webo/modeling/Modeling.h"\par
+\tab #include "webo/modeling/datatype/DataTypes.h"\par
+\tab\par
+\tab using namespace webo::modeling;\par
+\tab using namespace webo::modeling::datatype;\par
+\tab using namespace webo::encoding_xml;\f0\par
+\par
+\par
+2. Define a ClassModel as a holder for dynamically created classes\par
+\par
+\f1\tab ClassModel myClasses;\f0\par
+\par
+3. Define a class for each XML Element\par
+\par
+\f1\tab Class & myOuterElement = myClasses.createClass("MyOuterElement");\par
+\tab Class & myInnerElement = myClasses.createClass("MyInnerElement");\f0\par
+\par
+4. Define attributes with a name starting with '@' to create simple XML Elements\par
+\par
+\tab\f1 myOuterElement.addAttribute("@id", tInteger::Instance());\f0\par
+\par
+5. Define attributes with a name starting with '#' to create XML attributes\par
+\par
+\f1\tab myOuterElement.addAttribute("#attr", tString::Instance());\f0\par
+\par
+6. Assemble the nodes to form the XML structure\par
+\par
+\f1\tab myOuterElement.addAttribute("node1", myInnerElmeent);\f0\par
+\tab\par
+7. Allocate the objects that form the XML structure\par
+\par
+\f1\tab Object myOuter(myOuterElement);\par
+\tab Object myInner(myInnerElement);\par
+\tab myOuter.set("#attr", "a");\par
+\tab myOuter.set("@id", tInteger::Value(1));\par
+\tab myOuter.set("node1", myInner);\f0\par
+\par
+8. Use the XML utility class to generate the XML data\par
+\par
+\f1\tab XML xml(myClasses);\par
+\tab cout << xml.stringify(myOuter, myOuterElement) << std::endl;\par
+\par
+\par
+\tab <MyOuterElement attr="a">\par
+\tab\tab <id>1</id>\par
+\tab\tab <MyInnerElement></MyInnerElement>\par
+\tab </MyOuterElement>\f0\par
+\par
+\par
+\i Decoding from XML\i0\par
+\par
+This feature is not currently supported.\par
+\fs22\par
+\par
+\b APPENDIX A. WINDOWS INSTALLATION\b0\par
+\par
+\fs20 To install the toolkit into your Visual Studio solution, you must first copy the public header files and DLLs into a third party directory to be used by your projects. The \f1 public \f0 folder of the webo build project contains both. Note that while the Boost libaries are required to build a number of the toolkit's components, a Boost installation is not required to link the built libraries into your application.\par
+\par
+For example, if your third party directory is defined by the environment variable \f1 3RD_PARTY\f0 , you may copy the public folder from a successfully built toolkit into a directory called \f1 webo\f0  under your third party directory:\par
+\par
+\f1\tab <webo solution>/public\f0   --->  \f1 $(3RD_PARTY)/webo\f0\par
+\par
+The following changes would be made to a VS2015 project file to import and use the Webo Toolkit modeling library:\par
+\par
+\f1\tab C/C++->General->Additional Include Directories\par
+\par
+\tab\tab $(3RD_PARTY)/webo/public\par
+\par
+\tab Linker->General->Additional Library Directories\par
+\par
+\tab\tab $(3RD_PARTY)/webo/public/lib\par
+\par
+\tab Linker->Input->Additional Dependencies\par
+\par
+\tab\tab modeling-d.lib (for debug)\par
+\tab\tab modeling.lib (for release)\fs22\par
+\f0\par
+\par
+\b APPENDIX B. LINUX INSTALLATION\b0\par
+\par
+\fs20 All libraries are based on standard C++ and are therefore compatible with Linux C++ projects, after building the source code. The file \f1 ClassStore.cpp\f0  must be modified to use the Korn shell version of the function \f1 mkdir()\f0 , used to create folders in the file system.\fs22\par
+\tab\par
+\par
+\par
+}
+ 
