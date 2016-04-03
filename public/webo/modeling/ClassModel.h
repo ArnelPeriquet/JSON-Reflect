@@ -11,8 +11,10 @@
 #pragma once
 
 #include <map>
+#include <functional>
 
 #include "webo/modeling/Type.h"
+#include "webo/modeling/Class.h"
 
 
 namespace webo {
@@ -23,6 +25,10 @@ namespace webo {
 
 		class MODELING_API ClassModel {           
 		public:
+            ClassModel::ClassModel(
+                std::function<Class *(std::string name, std::string nameSpace)>
+                factory = [](std::string name, std::string nameSpace) {return new Class(name, nameSpace); }
+            );
             virtual ~ClassModel();
 			virtual Class & createClass(std::string name, std::string nameSpace = Type::DEFAULT_NAME_SPACE);
 			virtual bool hasClass(std::string name, std::string nameSpace = Type::DEFAULT_NAME_SPACE);
@@ -30,6 +36,7 @@ namespace webo {
 
 		private:
 			std::map<std::string, Class *> mClasses;
+            std::function<Class * (std::string name, std::string nameSpace)> mFactory;
 		};
 
 	}

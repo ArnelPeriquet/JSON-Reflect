@@ -20,6 +20,10 @@ namespace webo {
 
 	namespace modeling {
 
+        ClassModel::ClassModel(std::function<Class *(std::string name, std::string nameSpace)> factory) {
+            mFactory = factory;
+        }
+
         ClassModel::~ClassModel() {
             for (std::map<std::string, Class *>::iterator it = mClasses.begin(); it != mClasses.end(); ++it)
                 delete it->second;         
@@ -37,7 +41,8 @@ namespace webo {
                 realNameSpace = name.substr(0, index);
             }
 
-			Class * type = new Class(realName, realNameSpace);
+            Class * type = mFactory(realName, realNameSpace);
+
 			std::string fullyQualifiedName = type->getFullyQualifiedName();
 
             if (mClasses.find(fullyQualifiedName) != mClasses.end()) {

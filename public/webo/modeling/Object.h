@@ -47,6 +47,21 @@ namespace webo {
 			std::shared_ptr<Object> set(std::string name, std::shared_ptr<Object> value);
 			std::shared_ptr<Object> get(std::string name);
 
+            // convenience methods
+            std::shared_ptr<Object> set(std::string name, char * value);
+            std::shared_ptr<Object> set(std::string name, std::string value);
+            std::shared_ptr<Object> set(std::string name, char value);
+            std::shared_ptr<Object> set(std::string name, int value);
+            std::shared_ptr<Object> set(std::string name, double value);
+            std::shared_ptr<Object> set(std::string name, float value);
+            std::shared_ptr<Object> set(std::string name, bool value);
+            std::shared_ptr<Object> set(std::string name, std::vector<std::string> value);
+            std::shared_ptr<Object> set(std::string name, std::vector<char> value);
+            std::shared_ptr<Object> set(std::string name, std::vector<int> value);
+            std::shared_ptr<Object> set(std::string name, std::vector<double> value);            
+            std::shared_ptr<Object> set(std::string name, std::vector<float> value);
+            std::shared_ptr<Object> set(std::string name, std::vector<bool> value);
+
 			std::string asString(std::string value);
 			char asCharacter(char value);
 			int asInteger(int value);

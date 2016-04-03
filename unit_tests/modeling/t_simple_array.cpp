@@ -159,3 +159,16 @@ BOOST_AUTO_TEST_CASE(tarray_has_tarray_type_name)
     Type & arrType = tArray<tString>::instance();
     BOOST_CHECK_EQUAL(arrType.name, "tArray<tString>");
 }
+
+BOOST_AUTO_TEST_CASE(tobject_supports_boolean_array_setter)
+{
+    Class myClass("MyClass");
+    myClass.addAttribute("testBools", tArray<tBoolean>::instance());
+    Object myObject(myClass);
+    std::vector<bool> arr = { true, false, true };
+    myObject.set("testBools", arr);
+
+    BOOST_CHECK(myObject.get("testBools")->asArray()[0]->asBoolean() == true);
+    BOOST_CHECK(myObject.get("testBools")->asArray()[1]->asBoolean() == false);
+    BOOST_CHECK(myObject.get("testBools")->asArray()[2]->asBoolean() == true);
+}

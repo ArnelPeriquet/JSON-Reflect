@@ -123,6 +123,54 @@ namespace webo {
             }
         }
 
+        // convenience methods
+        std::shared_ptr<Object> Object::set(std::string name, char * value) { return set(name, tString::value(value)); }
+        std::shared_ptr<Object> Object::set(std::string name, std::string value) { return set(name, tString::value(value)); }
+        std::shared_ptr<Object> Object::set(std::string name, char value) { return set(name, tCharacter::value(value)); }
+        std::shared_ptr<Object> Object::set(std::string name, int value) { return set(name, tInteger::value(value)); }
+        std::shared_ptr<Object> Object::set(std::string name, double value) { return set(name, tFloat::value(value)); }
+        std::shared_ptr<Object> Object::set(std::string name, float value) { return set(name, tFloat::value(value)); }
+        std::shared_ptr<Object> Object::set(std::string name, bool value) { return set(name, tBoolean::value(value)); }
+        std::shared_ptr<Object> Object::set(std::string name, std::vector<std::string> value) {
+            return set(name, tArray<tString>::value(&value[0], value.size()));
+        }
+        std::shared_ptr<Object> Object::set(std::string name, std::vector<char> value) {
+            return set(name, tArray<tCharacter>::value(&value[0], value.size()));
+        }
+        std::shared_ptr<Object> Object::set(std::string name, std::vector<int> value) {
+            return set(name, tArray<tInteger>::value(&value[0], value.size()));
+        }
+        std::shared_ptr<Object> Object::set(std::string name, std::vector<double> value) {
+            return set(name, tArray<tFloat>::value(&value[0], value.size()));
+        }
+        std::shared_ptr<Object> Object::set(std::string name, std::vector<float> value) {
+            return set(name, tArray<tFloat>::value(&value[0], value.size()));
+        }
+        std::shared_ptr<Object> Object::set(std::string name, std::vector<bool> value) {
+            bool * arr = nullptr;
+            std::shared_ptr<Object> object;
+
+            try {
+                arr = new bool[value.size()];
+                size_t idx = 0;
+
+                for (bool val : value)
+                    arr[idx++] = val;
+
+                object = set(name, tArray<tBoolean>::value(arr, value.size()));
+            }
+            catch (std::exception &) {
+                if (arr)
+                    delete[] arr;
+                throw;
+            }
+
+            if (arr)
+                delete[] arr;
+
+            return object;
+        }
+
         std::shared_ptr<Object> Object::set(std::string name, std::shared_ptr<Object> value) {
             if (type.isBuiltIn())
                 throw ObjectIsNotAClassException("attempt to set attribute value on type that is not a class, type=" + type.name);
