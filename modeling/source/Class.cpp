@@ -12,6 +12,7 @@
 #include "webo/modeling/Class.h"
 #include "webo/modeling/tObject.h"
 #include <webo/modeling/datatype/tVoid.h>
+#include <webo/modeling/ModelExceptions.h>
 
 
 namespace webo {
@@ -44,7 +45,7 @@ namespace webo {
 
 		Type & Class::getAttributeType(std::string name) {
 			if (mAttributes.find(name) == mAttributes.end())
-				throw std::invalid_argument("attempt to get attribute type for unknown attribute");
+				throw UnknownAttributeException("attempt to get attribute type for unknown attribute " + name);
 
 			return *mAttributes[name];
 		}

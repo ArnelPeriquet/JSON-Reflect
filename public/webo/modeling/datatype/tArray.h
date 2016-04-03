@@ -27,13 +27,14 @@ namespace webo {
 			public:
 				static tArray<T> & instance();
 
-				virtual bool isArray();
+				virtual bool isSimpleArray();
 
 				static std::shared_ptr<Object> value(); // empty array
                 static std::shared_ptr<Object> value(size_t length);
 				static std::shared_ptr<Object> value(char arr[], size_t length);
 				static std::shared_ptr<Object> value(int arr[], size_t length);
                 static std::shared_ptr<Object> value(double arr[], size_t length);
+                static std::shared_ptr<Object> value(float arr[], size_t length);
 				static std::shared_ptr<Object> value(std::string arr[], size_t length);
 				static std::shared_ptr<Object> value(bool arr[], size_t length);
 

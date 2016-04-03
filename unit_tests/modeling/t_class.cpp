@@ -13,6 +13,7 @@
 #include <boost/test/unit_test.hpp>
 #include "webo/modeling/Class.h"
 #include "webo/modeling/datatype/DataTypes.h"
+#include <webo/modeling/ModelExceptions.h>
 
 using namespace webo::modeling;
 using namespace webo::modeling::datatype;
@@ -62,7 +63,7 @@ BOOST_AUTO_TEST_CASE(class_has_attribute_succeeds_when_present )
 BOOST_AUTO_TEST_CASE( class_get_attribute_type_for_missing_attribute_fails )
 {
     Class myClass("MyClass");
-    BOOST_CHECK_THROW(myClass.getAttributeType("my_attr"), std::invalid_argument);
+    BOOST_CHECK_THROW(myClass.getAttributeType("my_attr"), UnknownAttributeException);
 }
 
 BOOST_AUTO_TEST_CASE( class_get_attribute_type_succeeds )

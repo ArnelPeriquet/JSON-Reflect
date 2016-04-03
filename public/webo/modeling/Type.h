@@ -28,7 +28,7 @@ namespace webo {
 
 			virtual bool equals(const Type & type);
 			virtual bool isBuiltIn();
-			virtual bool isArray();
+			virtual bool isSimpleArray();
 			virtual bool isObjectArray();
 
 			std::string getFullyQualifiedName() const;

@@ -126,9 +126,9 @@ BOOST_AUTO_TEST_CASE(json_stringify_array_of_array_of_bools) {
     std::shared_ptr<Object> arr3 = tArray<tBoolean>::value(booleans, 3);
 
     std::shared_ptr<Object> arr = tArray<tArray<tBoolean>>::value(3);
-    arr->asArray<tArray<tBoolean>>()[0] = arr1;
-    arr->asArray<tArray<tBoolean>>()[1] = arr2;
-    arr->asArray<tArray<tBoolean>>()[2] = arr3;
+    arr->asArray()[0] = arr1;
+    arr->asArray()[1] = arr2;
+    arr->asArray()[2] = arr3;
 
     o.set("myValue", arr);
     //std::cout << json.stringify(o, c) << std::endl;
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(json_stringify_embedded_object_with_array_of_objects) {
     std::shared_ptr<Object> embedded = o.get("embedded");
     std::shared_ptr<Object> arr = embedded->set("myArray", tObjectArray::value(elementClass, 3));
 
-    std::shared_ptr<Object> * nativeArr = arr->asObjectArray(elementClass);
+    std::shared_ptr<Object> * nativeArr = arr->asObjectArray();
     nativeArr[0]->set("myValue", tInteger::value(1));
     nativeArr[1]->set("myValue", tInteger::value(2));
     nativeArr[2]->set("myValue", tInteger::value(3));

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "webo/modeling/datatype/tNull.h"
+#include <vector>
 #include <memory>
 #include <map>
 

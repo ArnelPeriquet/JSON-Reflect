@@ -37,7 +37,7 @@ namespace webo {
 			std::stringstream ss;
 
             if (type.isBuiltIn()) {
-                if (type.isArray())
+                if (type.isSimpleArray())
                     stringifyArray(ss, object, type);
                 else if (type.isObjectArray())
                     stringifyObjectArray(ss, object, type, allowMissingAttributes);
@@ -75,7 +75,7 @@ namespace webo {
 					indent(ss);
 
 					if (attribType.isBuiltIn()) {
-						if (attribType.isArray())
+						if (attribType.isSimpleArray())
 							stringifyArray(ss, *attribValue, attribType);
 						else if (attribType.isObjectArray())
 							stringifyObjectArray(ss, *attribValue, attribType, allowMissingAttributes);
@@ -112,7 +112,7 @@ namespace webo {
 			indent(ss);
 
 			if (type == tArray<tCharacter>::instance()) {
-				std::shared_ptr<Object> * arr = object.asArray<tCharacter>();
+				std::shared_ptr<Object> * arr = object.asArray();
 
 				for (int i = 0; i < length; i++) {
 					ss << "\"" << arr[i]->asCharacter() << "\"";
@@ -125,7 +125,7 @@ namespace webo {
 			}
 
 			if (type == tArray<tInteger>::instance()) {
-				std::shared_ptr<Object> * arr = object.asArray<tInteger>();
+				std::shared_ptr<Object> * arr = object.asArray();
 
 				for (int i = 0; i < length; i++) {
 					ss << arr[i]->asInteger();
@@ -138,7 +138,7 @@ namespace webo {
 			}
 
             if (type == tArray<tFloat>::instance()) {
-                std::shared_ptr<Object> * arr = object.asArray<tFloat>();
+                std::shared_ptr<Object> * arr = object.asArray();
 
                 for (int i = 0; i < length; i++) {
                     ss << arr[i]->asFloat();
@@ -151,7 +151,7 @@ namespace webo {
             }
 
 			if (type == tArray<tString>::instance()) {
-				std::shared_ptr<Object> * arr = object.asArray<tString>();
+				std::shared_ptr<Object> * arr = object.asArray();
 
 				for (int i = 0; i < length; i++) {
 					ss << "\"" << arr[i]->asString() << "\"";
@@ -164,7 +164,7 @@ namespace webo {
 			}
 
 			if (type == tArray<tBoolean>::instance()) {
-				std::shared_ptr<Object> * arr = object.asArray<tBoolean>();
+				std::shared_ptr<Object> * arr = object.asArray();
 
 				for (int i = 0; i < length; i++) {
 					ss << (arr[i]->asBoolean() ? "true" : "false");
@@ -177,7 +177,7 @@ namespace webo {
 			}
 
             if (type == tArray<tNull>::instance()) {
-                std::shared_ptr<Object> * arr = object.asArray<tNull>();
+                std::shared_ptr<Object> * arr = object.asArray();
 
                 for (int i = 0; i < length; i++) {
                     ss << "null";
@@ -190,7 +190,7 @@ namespace webo {
             }
 
             if (type == tArray<tArray<tBoolean>>::instance()) {
-                std::shared_ptr<Object> * arr = object.asArray<tArray<tBoolean>>();
+                std::shared_ptr<Object> * arr = object.asArray();
 
                 for (int i = 0; i < length; i++) {
                     stringifyArray(ss, *arr[i], tArray<tBoolean>::instance());
@@ -215,12 +215,12 @@ namespace webo {
 
 			if (type.isObjectArray()) {
 				tObjectArray & objArrType = dynamic_cast<tObjectArray &>(type);
-				Class & baseClass = objArrType.getBaseType();
-				std::shared_ptr<Object> * arr = object.asObjectArray(baseClass);
+				std::shared_ptr<Object> * arr = object.asObjectArray();
 				int length = object.getObjectArrayLength();
 
 				for (int i = 0; i < length; i++) {
-					stringifyObject(ss, *arr[i], baseClass, allowMissingAttributes);
+                    Class & clazz = dynamic_cast<Class &>(arr[i]->type);
+					stringifyObject(ss, *arr[i], clazz, allowMissingAttributes);
 
 					if (i != length - 1) {
 						ss << ",\n";

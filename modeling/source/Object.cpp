@@ -26,7 +26,6 @@ namespace webo {
         char                                            mCharacterValue;
         int                                             mIntegerValue;
         bool                                            mBooleanValue;
-        Class *                                         mObjectArrayBaseType;
 
         Object::Object(Type & type) : type(type) {
             if (type == tVoid::instance())
@@ -53,7 +52,6 @@ namespace webo {
             mIntegerValue = 0;
             mFloatValue = 0.0;
             mBooleanValue = false;
-            mObjectArrayBaseType = nullptr;
             mArrayValue = nullptr;
             mArrayLength = 0;
             mObjectArrayValue = nullptr;
@@ -125,7 +123,7 @@ namespace webo {
             }
         }
 
-        std::shared_ptr<Object> Object::set(std::string name, std::shared_ptr<Object> iValue) {
+        std::shared_ptr<Object> Object::set(std::string name, std::shared_ptr<Object> value) {
             if (type.isBuiltIn())
                 throw ObjectIsNotAClassException("attempt to set attribute value on type that is not a class, type=" + type.name);
 
@@ -134,12 +132,12 @@ namespace webo {
             if (!c.hasAttribute(name))
                 throw UnknownAttributeException("unknown attribute name=" + name);
 
-            if (!iValue->type.equals(tNull::instance()) &&  // type tNull is compatible with all other types
-                !c.getAttributeType(name).equals(iValue->type))
+            if (!value->type.equals(tNull::instance()) &&  // type tNull is compatible with all other types
+                !c.getAttributeType(name).equals(value->type))
                 throw TypeMismatchException("mismatched type while trying to set value for attribute \"" + name + "\", expecting type=" 
-                    + c.getAttributeType(name).name + " but got type=" + iValue->type.name);
+                    + c.getAttributeType(name).name + " but got type=" + value->type.name);
 
-            mAttributeValues[name] = iValue;
+            mAttributeValues[name] = value;
 
             return mAttributeValues[name];
         }
@@ -174,10 +172,10 @@ namespace webo {
                         mAttributeValues[name] = tBoolean::value(false);
                     else if (attribType.equals(tNull::instance()))
                         mAttributeValues[name] = tNull::value();
-                    else if (attribType.isArray())
-                        ; // we can't instantiate an array cause we don't know the length
+                    else if (attribType.isSimpleArray())
+                        throw std::exception(std::string("object must be allocated and set() before you cat get(). default array not allocated due to unknown size, type=" + attribType.name).c_str());
                     else if (attribType.isObjectArray())
-                        ; // we can't instantiate an array cause we don't know the length
+                        throw std::exception(std::string("object must be allocated and set() before you cat get(). default array not allocated due to unknown size, type=" + attribType.name).c_str());
                     else
                         throw std::exception(std::string("unknown type encountered, type=" + attribType.name).c_str());
                 } else {
@@ -233,24 +231,6 @@ namespace webo {
             return mBooleanValue;
         }
 
-        std::shared_ptr<Object> * Object::asObjectArray(Class & iBaseType, int iLength) {
-            if (!type.equals(tObjectArray::instance(iBaseType)))
-                throw TypeMismatchException("mismatched type while trying to set value as " + tObjectArray::instance(iBaseType).name + ", type=" + type.name);
-
-            if (iLength <= 0) {
-                std::ostringstream oss;
-                oss << iLength;
-                throw std::invalid_argument(std::string("requested array length of ") + oss.str() + " is not valid");
-            }
-
-            deleteObjectArrayValue();
-            mObjectArrayValue = new std::shared_ptr<Object>[iLength];
-            mObjectArrayLength = iLength;
-            mObjectArrayBaseType = &iBaseType;
-
-            return mObjectArrayValue;
-        }
-
         std::string Object::asString() const {
             if (!type.equals(tString::instance()))
                 throw TypeMismatchException("mismatched type while trying to get value as tString, type=" + type.name);
@@ -290,18 +270,50 @@ namespace webo {
             return type.equals(tNull::instance());
         }
 
+        std::shared_ptr<Object> * Object::asArray(int length) {
+            if (length <= 0) {
+                std::ostringstream oss;
+                oss << length;
+                throw std::invalid_argument(std::string("requested array length of ") + oss.str() + " is not valid");
+            }
+
+            deleteArrayValue();
+            mArrayValue = new std::shared_ptr<Object>[length];
+            mArrayLength = length;
+
+            return mArrayValue;
+        }
+
         size_t Object::getArrayLength() const {
             return mArrayLength;
+        }
+        
+        std::shared_ptr<Object> * Object::asArray()  const {
+            if (mArrayLength <= 0)
+                return nullptr;
+
+            return mArrayValue;
+        }        
+
+        std::shared_ptr<Object> * Object::asObjectArray(int iLength) {
+            if (iLength <= 0) {
+                std::ostringstream oss;
+                oss << iLength;
+                throw std::invalid_argument(std::string("requested array length of ") + oss.str() + " is not valid");
+            }
+
+            deleteObjectArrayValue();
+            mObjectArrayValue = new std::shared_ptr<Object>[iLength];
+            mObjectArrayLength = iLength;
+
+            return mObjectArrayValue;
         }
 
         size_t Object::getObjectArrayLength() const {
             return mObjectArrayLength;
         }
 
-        std::shared_ptr<Object> * Object::asObjectArray(Class & iBaseType) const {
-            if (!type.equals(tObjectArray::instance(iBaseType)))
-                throw TypeMismatchException("mismatched type while trying to get value as " + tObjectArray::instance(iBaseType).name + ", type=" + type.name);
-
+        std::shared_ptr<Object> * Object::asObjectArray() const {
             if (mObjectArrayLength <= 0)
                 return nullptr;
 

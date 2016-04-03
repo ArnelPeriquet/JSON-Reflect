@@ -32,8 +32,8 @@ namespace webo {
 				
 				virtual bool isObjectArray();
 				Class & getBaseType() const;
-                
-                tObjectArray(Class & baseType);
+                       
+                tObjectArray(Class & baseType, bool internal);
 
             private:
                 Class & mBaseType;

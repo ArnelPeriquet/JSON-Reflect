@@ -49,7 +49,7 @@ namespace webo {
 			}
 
 			template <typename T>
-			bool tArray<T>::isArray() {
+			bool tArray<T>::isSimpleArray() {
 				return true;
 			}
 
@@ -62,10 +62,10 @@ namespace webo {
             template <typename T>
             std::shared_ptr<Object> tArray<T>::value(size_t length) {
                 std::shared_ptr<Object> object = std::make_shared<Object>(instance());
-                object->asArray<T>(length);
+                object->asArray(length);
 
                 for (size_t i=0; i<length; i++)
-                    object->asArray<T>()[i] = std::make_shared<Object>(T::instance());
+                    object->asArray()[i] = std::make_shared<Object>(T::instance());
 
                 return object;
             }
@@ -73,10 +73,10 @@ namespace webo {
 			template <typename T>
 			std::shared_ptr<Object> tArray<T>::value(char arr[], size_t length) {
                 std::shared_ptr<Object> object = std::make_shared<Object>(instance());
-                object->asArray<T>(length);
+                object->asArray(length);
 
 				for (size_t i=0; i<length; i++)
-					object->asArray<T>()[i] = tCharacter::value(arr[i]);
+					object->asArray()[i] = tCharacter::value(arr[i]);
 
 				return object;
 			}
@@ -84,10 +84,10 @@ namespace webo {
 			template <typename T>
 			std::shared_ptr<Object> tArray<T>::value(int arr[], size_t length) {
 				std::shared_ptr<Object> object = std::make_shared<Object>(instance());
-                object->asArray<T>(length);
+                object->asArray(length);
 
 				for (size_t i=0; i<length; i++)
-					object->asArray<T>()[i] = tInteger::value(arr[i]);
+					object->asArray()[i] = tInteger::value(arr[i]);
 
 				return object;
 			}
@@ -95,10 +95,21 @@ namespace webo {
             template <typename T>
             std::shared_ptr<Object> tArray<T>::value(double arr[], size_t length) {
                 std::shared_ptr<Object> object = std::make_shared<Object>(instance());
-                object->asArray<T>(length);
+                object->asArray(length);
 
                 for (size_t i = 0; i<length; i++)
-                    object->asArray<T>()[i] = tFloat::value(arr[i]);
+                    object->asArray()[i] = tFloat::value(arr[i]);
+
+                return object;
+            }
+
+            template <typename T>
+            std::shared_ptr<Object> tArray<T>::value(float arr[], size_t length) {
+                std::shared_ptr<Object> object = std::make_shared<Object>(instance());
+                object->asArray(length);
+
+                for (size_t i = 0; i<length; i++)
+                    object->asArray()[i] = tFloat::value(arr[i]);
 
                 return object;
             }
@@ -106,10 +117,10 @@ namespace webo {
 			template <typename T>
 			std::shared_ptr<Object> tArray<T>::value(std::string arr[], size_t length) {
 				std::shared_ptr<Object> object = std::make_shared<Object>(instance());
-                object->asArray<T>(length);
+                object->asArray(length);
 
 				for (size_t i=0; i<length; i++)
-					object->asArray<T>()[i] = tString::value(arr[i]);
+					object->asArray()[i] = tString::value(arr[i]);
 
 				return object;
 			}
@@ -117,10 +128,10 @@ namespace webo {
 			template <typename T>
 			std::shared_ptr<Object> tArray<T>::value(bool arr[], size_t length) {
 				std::shared_ptr<Object> object = std::make_shared<Object>(instance());
-                object->asArray<T>(length);
+                object->asArray(length);
 
 				for (size_t i=0; i<length; i++)
-					object->asArray<T>()[i] = tBoolean::value(arr[i]);
+					object->asArray()[i] = tBoolean::value(arr[i]);
 
 				return object;
 			}

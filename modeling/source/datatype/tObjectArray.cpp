@@ -24,7 +24,7 @@ namespace webo {
 
             tObjectArray & tObjectArray::instance(Class & baseType) {
                 if (!baseType.mObjectArrayType)
-                    baseType.mObjectArrayType = std::make_shared<tObjectArray>(baseType);
+                    baseType.mObjectArrayType = std::make_shared<tObjectArray>(baseType, true);
 
                 return *baseType.mObjectArrayType;
             }
@@ -36,9 +36,9 @@ namespace webo {
 
             std::shared_ptr<Object> tObjectArray::value(Class & baseType, size_t length) {
                 std::shared_ptr<Object> object = std::make_shared<Object>(instance(baseType));
-                object->asObjectArray(baseType, length);
+                object->asObjectArray(length);
 
-                std::shared_ptr<Object> * nativeArr = object->asObjectArray(baseType);
+                std::shared_ptr<Object> * nativeArr = object->asObjectArray();
 
                 for (size_t i=0; i<length; i++)
                     nativeArr[i] = std::make_shared<Object>(baseType);
@@ -48,9 +48,9 @@ namespace webo {
 
             std::shared_ptr<Object> tObjectArray::value(Class & baseType, std::shared_ptr<Object> arr[], size_t length) {
                 std::shared_ptr<Object> object = std::make_shared<Object>(instance(baseType));
-                object->asObjectArray(baseType, length);
+                object->asObjectArray(length);
 
-                std::shared_ptr<Object> * nativeArr = object->asObjectArray(baseType);
+                std::shared_ptr<Object> * nativeArr = object->asObjectArray();
 
                 for (size_t i = 0; i < length; i++)
                     nativeArr[i] = arr[i];
@@ -58,7 +58,8 @@ namespace webo {
                 return object;
             }
 
-            tObjectArray::tObjectArray(Class & baseType)
+            // note: internal flag used as mandatory parameter to prevent accidently instantiation via this internal, yet public ctor
+            tObjectArray::tObjectArray(Class & baseType, bool internal)
                 : DataType("tObjectArray<" + baseType.name + ">"), mBaseType(baseType) {
             }
 

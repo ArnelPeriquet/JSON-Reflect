@@ -30,6 +30,7 @@ namespace webo {
 
 		public:
 			Class(std::string name, std::string nameSpace = Type::DEFAULT_NAME_SPACE);
+            virtual ~Class() {}
 
 			virtual bool isBuiltIn();
 

@@ -44,7 +44,7 @@ namespace webo {
 			bool equals(Object & object);
             
 			bool hasValue(std::string name);
-			std::shared_ptr<Object> set(std::string name, std::shared_ptr<Object> iValue);
+			std::shared_ptr<Object> set(std::string name, std::shared_ptr<Object> value);
 			std::shared_ptr<Object> get(std::string name);
 
 			std::string asString(std::string value);
@@ -53,27 +53,6 @@ namespace webo {
             double asFloat(double value);
 			bool asBoolean(bool value);
 
-			std::shared_ptr<Object> * asObjectArray(Class & baseType, int length);
-
-			template <typename T>
-			std::shared_ptr<Object> * asArray(int length) {
-				if (!type.equals(webo::modeling::datatype::tArray<T>::instance()))
-					throw webo::modeling::TypeMismatchException("mismatched type while trying to set value as " + 
-                        type.name + ", expected type=" + webo::modeling::datatype::tArray<T>::instance().name);
-
-				if (length <= 0) {
-					std::ostringstream oss;
-					oss << length;
-					throw std::invalid_argument(std::string("requested array length of ") + oss.str() + " is not valid");
-				}
-
-				deleteArrayValue();
-				mArrayValue = new std::shared_ptr<Object>[length];
-				mArrayLength = length;
-
-				return mArrayValue;
-			}
-
 			std::string asString() const;
 			char asCharacter() const;
 			int asInteger() const;
@@ -81,22 +60,13 @@ namespace webo {
 			bool asBoolean() const;
             bool isNull() const;
 
+            std::shared_ptr<Object> * asArray(int length);
+            size_t getArrayLength() const;
+            std::shared_ptr<Object> * asArray() const;
+
+            std::shared_ptr<Object> * asObjectArray(int length);
 			size_t getObjectArrayLength() const;
-			std::shared_ptr<Object> * asObjectArray(Class & baseType) const;
-
-			size_t getArrayLength() const;
-
-			template <typename T>
-			std::shared_ptr<Object> * asArray()  const {
-				if (!type.equals(datatype::tArray<T>::instance()))
-					throw TypeMismatchException("mismatched type while trying to get value as " + type.name + 
-                        ", expected type=" + webo::modeling::datatype::tArray<T>::instance().name);
-
-				if (mArrayLength <= 0)
-					return nullptr;
-
-				return mArrayValue;
-			}
+			std::shared_ptr<Object> * asObjectArray() const;			
 
 			Type & type;
 
@@ -117,7 +87,6 @@ namespace webo {
             size_t                                          mArrayLength;
 			std::shared_ptr<Object> *                       mObjectArrayValue;
 			size_t                                          mObjectArrayLength;
-			Class *                                         mObjectArrayBaseType;
 		};
 
 	}

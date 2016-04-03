@@ -23,9 +23,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\Type.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\datatype\DataType.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -38,6 +35,9 @@
     <ClCompile Include="source\datatype\tCharacter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\datatype\tFloat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\datatype\tInteger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -48,6 +48,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\datatype\tString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\datatype\tVoid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\Class.cpp">
@@ -68,10 +71,7 @@
     <ClCompile Include="source\tObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\datatype\tFloat.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\datatype\tVoid.cpp">
+    <ClCompile Include="source\Type.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE( json_parse_char_array_attribute )
 
     JSON json(cm);
     std::shared_ptr<Object> myObject = json.parse(jsonWithCharacterArrayAttribute, myClass);
-    std::shared_ptr<Object> * arr = myObject->get("myArray")->asArray<tCharacter>();
+    std::shared_ptr<Object> * arr = myObject->get("myArray")->asArray();
     BOOST_CHECK_EQUAL('d', arr[0]->asCharacter());
     BOOST_CHECK_EQUAL('a', arr[1]->asCharacter());
     BOOST_CHECK_EQUAL('z', arr[2]->asCharacter());    
@@ -243,7 +243,7 @@ BOOST_AUTO_TEST_CASE( json_parse_int_array_attribute )
 
     JSON json(cm);
     std::shared_ptr<Object> myObject = json.parse(jsonWithIntegerArrayAttribute, myClass);
-    std::shared_ptr<Object> * arr = myObject->get("myArray")->asArray<tInteger>();
+    std::shared_ptr<Object> * arr = myObject->get("myArray")->asArray();
     BOOST_CHECK_EQUAL(7, arr[0]->asInteger());
     BOOST_CHECK_EQUAL(1, arr[1]->asInteger());
     BOOST_CHECK_EQUAL(9, arr[2]->asInteger()); 
@@ -261,7 +261,7 @@ BOOST_AUTO_TEST_CASE(json_parse_float_array_attribute)
 
     JSON json(cm);
     std::shared_ptr<Object> myObject = json.parse(jsonWithFloatArrayAttribute, myClass);
-    std::shared_ptr<Object> * arr = myObject->get("myArray")->asArray<tFloat>();
+    std::shared_ptr<Object> * arr = myObject->get("myArray")->asArray();
     BOOST_CHECK_EQUAL(1.1, arr[0]->asFloat());
     BOOST_CHECK_EQUAL(2.2, arr[1]->asFloat());
     BOOST_CHECK_EQUAL(3.3, arr[2]->asFloat());
@@ -279,7 +279,7 @@ BOOST_AUTO_TEST_CASE( json_parse_string_array_attribute )
 
     JSON json(cm);
     std::shared_ptr<Object> myObject = json.parse(jsonWithStringArrayAttribute, myClass);
-    std::shared_ptr<Object> * array = myObject->get("myArray")->asArray<tString>();
+    std::shared_ptr<Object> * array = myObject->get("myArray")->asArray();
     BOOST_CHECK_EQUAL("this", array[0]->asString());
     BOOST_CHECK_EQUAL("is", array[1]->asString());
     BOOST_CHECK_EQUAL("cool", array[2]->asString());
@@ -297,7 +297,7 @@ BOOST_AUTO_TEST_CASE( json_parse_boolean_array_attribute )
 
     JSON json(cm);
     std::shared_ptr<Object> myObject = json.parse(jsonWithBooleanArrayAttribute, myClass);
-    std::shared_ptr<Object> * arr = myObject->get("myArray")->asArray<tBoolean>();
+    std::shared_ptr<Object> * arr = myObject->get("myArray")->asArray();
     BOOST_CHECK_EQUAL(true, arr[0]->asBoolean());
     BOOST_CHECK_EQUAL(false, arr[1]->asBoolean());
     BOOST_CHECK_EQUAL(false, arr[2]->asBoolean());
@@ -321,8 +321,8 @@ BOOST_AUTO_TEST_CASE( json_parse_object_array_attribute )
 
     BOOST_CHECK_EQUAL(attrib->getObjectArrayLength(), 2);
     BOOST_CHECK(tObjectArray::instance(myClass2) == attrib->type);
-    BOOST_CHECK(myClass2 == attrib->asObjectArray(myClass2)[0]->type);
-    BOOST_CHECK(myClass2 == attrib->asObjectArray(myClass2)[1]->type);
+    BOOST_CHECK(myClass2 == attrib->asObjectArray()[0]->type);
+    BOOST_CHECK(myClass2 == attrib->asObjectArray()[1]->type);
 }
 
 BOOST_AUTO_TEST_CASE( json_parse_object_with_embedded_object )
@@ -341,8 +341,8 @@ BOOST_AUTO_TEST_CASE( json_parse_object_with_embedded_object )
     std::shared_ptr<Object> embeddedObject = json.parse(testJsonObject, myClass)->get("embeddedObject");
     std::shared_ptr<Object> attrib = embeddedObject->get("myArray");
 
-    BOOST_CHECK(myClass3 == attrib->asObjectArray(myClass3)[0]->type);
-    BOOST_CHECK(myClass3 == attrib->asObjectArray(myClass3)[1]->type);
+    BOOST_CHECK(myClass3 == attrib->asObjectArray()[0]->type);
+    BOOST_CHECK(myClass3 == attrib->asObjectArray()[1]->type);
 }
 
 BOOST_AUTO_TEST_CASE( json_parse_object_with_embedded_object_with_missing_attribute_fails )

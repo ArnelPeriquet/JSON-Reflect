@@ -46,18 +46,18 @@ BOOST_AUTO_TEST_CASE(tobject_array_uninitialized_array_has_objects_with_default_
     std::shared_ptr<Object> array = tObjectArray::value(myClass, 3);
 
     BOOST_CHECK(array->getObjectArrayLength() == 3);
-    BOOST_CHECK_EQUAL(array->asObjectArray(myClass)[0]->get("attr1")->asString(), "");
-    BOOST_CHECK_EQUAL(array->asObjectArray(myClass)[0]->get("attr2")->asInteger(), 0);
-    BOOST_CHECK_EQUAL(array->asObjectArray(myClass)[0]->get("attr3")->asFloat(), 0.0);
-    BOOST_CHECK_EQUAL(array->asObjectArray(myClass)[0]->get("attr4")->asCharacter(), 0);
-    BOOST_CHECK_EQUAL(array->asObjectArray(myClass)[0]->get("attr5")->asBoolean(), false);
+    BOOST_CHECK_EQUAL(array->asObjectArray()[0]->get("attr1")->asString(), "");
+    BOOST_CHECK_EQUAL(array->asObjectArray()[0]->get("attr2")->asInteger(), 0);
+    BOOST_CHECK_EQUAL(array->asObjectArray()[0]->get("attr3")->asFloat(), 0.0);
+    BOOST_CHECK_EQUAL(array->asObjectArray()[0]->get("attr4")->asCharacter(), 0);
+    BOOST_CHECK_EQUAL(array->asObjectArray()[0]->get("attr5")->asBoolean(), false);
 }
 
 BOOST_AUTO_TEST_CASE(tobjectarray_loop)
 {
     Class myClass("MyClass");
     std::shared_ptr<Object> arr = tObjectArray::value(myClass, 3);
-    std::shared_ptr<Object> * nativeArr = arr->asObjectArray(myClass);
+    std::shared_ptr<Object> * nativeArr = arr->asObjectArray();
 
     for (size_t i = 0; i<arr->getObjectArrayLength(); i++) {        
         BOOST_CHECK(nativeArr[i]->type == myClass);

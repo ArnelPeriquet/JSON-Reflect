@@ -47,7 +47,7 @@ namespace webo {
             return false;
         }
 
-        bool Type::isArray() {
+        bool Type::isSimpleArray() {
             return false;
         }
 

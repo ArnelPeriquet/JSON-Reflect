@@ -83,41 +83,41 @@ BOOST_AUTO_TEST_CASE(json_stringify_array_of_chars_type) {
     CHECK_CLASS(tArray<tCharacter>);
     char arr[] = { 'a', 'b', 'c' };
     BOOST_CHECK_NO_THROW(o.set("myValue", tArray<tCharacter>::value(arr, 3)));
-    BOOST_CHECK_EQUAL(o.get("myValue")->asArray<tCharacter>()[0]->asCharacter(), 'a');
+    BOOST_CHECK_EQUAL(o.get("myValue")->asArray()[0]->asCharacter(), 'a');
 }
 
 BOOST_AUTO_TEST_CASE(json_stringify_array_of_ints_type) {
     CHECK_CLASS(tArray<tInteger>);
     int arr[] = { 1, 2, 3 };
     BOOST_CHECK_NO_THROW(o.set("myValue", tArray<tInteger>::value(arr, 3)));
-    BOOST_CHECK_EQUAL(o.get("myValue")->asArray<tInteger>()[0]->asInteger(), 1);
+    BOOST_CHECK_EQUAL(o.get("myValue")->asArray()[0]->asInteger(), 1);
 }
 
 BOOST_AUTO_TEST_CASE(json_stringify_array_of_floats_type) {
     CHECK_CLASS(tArray<tFloat>);
     double arr[] = { 1.1, 2.2, 3.3 };
     BOOST_CHECK_NO_THROW(o.set("myValue", tArray<tFloat>::value(arr, 3)));
-    BOOST_CHECK_EQUAL(o.get("myValue")->asArray<tFloat>()[0]->asFloat(), 1.1);
+    BOOST_CHECK_EQUAL(o.get("myValue")->asArray()[0]->asFloat(), 1.1);
 }
 
 BOOST_AUTO_TEST_CASE(json_stringify_array_of_strings_type) {
     CHECK_CLASS(tArray<tString>);
     std::string arr[] = { "a", "b", "c" };
     BOOST_CHECK_NO_THROW(o.set("myValue", tArray<tString>::value(arr, 3)));
-    BOOST_CHECK_EQUAL(o.get("myValue")->asArray<tString>()[0]->asString(), "a");
+    BOOST_CHECK_EQUAL(o.get("myValue")->asArray()[0]->asString(), "a");
 }
 
 BOOST_AUTO_TEST_CASE(json_stringify_array_of_bools_type) {
     CHECK_CLASS(tArray<tBoolean>);
     bool arr[] = { true, false, true };
     BOOST_CHECK_NO_THROW(o.set("myValue", tArray<tBoolean>::value(arr, 3)));
-    BOOST_CHECK_EQUAL(o.get("myValue")->asArray<tBoolean>()[0]->asBoolean(), true);
+    BOOST_CHECK_EQUAL(o.get("myValue")->asArray()[0]->asBoolean(), true);
 }
 
 BOOST_AUTO_TEST_CASE(json_stringify_array_of_nulls_type) {
     CHECK_CLASS(tArray<tNull>);
     BOOST_CHECK_NO_THROW(o.set("myValue", tArray<tNull>::value(3)));
-    BOOST_CHECK(o.get("myValue")->asArray<tNull>()[0]->isNull());
+    BOOST_CHECK(o.get("myValue")->asArray()[0]->isNull());
 }
 
 BOOST_AUTO_TEST_CASE(json_stringify_embedded_class_with_array_of_bools_type) {

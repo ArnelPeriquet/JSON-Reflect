@@ -262,9 +262,8 @@ BOOST_AUTO_TEST_CASE( object_attribute_simplearray_is_not_default_initialized )
     Object o(c);
 
     c.addAttribute("arr", tArray<tString>::instance());
-    std::shared_ptr<Object> arr = o.get("arr");
 
-    BOOST_CHECK(!o.hasValue("arr"));
+    BOOST_CHECK_THROW(o.get("arr"), std::exception);
 }
 
 BOOST_AUTO_TEST_CASE(object_attribute_objectarray_is_not_default_initialized)
@@ -274,9 +273,8 @@ BOOST_AUTO_TEST_CASE(object_attribute_objectarray_is_not_default_initialized)
 
     Class c2("MyClass2");
     c.addAttribute("arr", tObjectArray::instance(c2));
-    std::shared_ptr<Object> arr = o.get("arr");
 
-    BOOST_CHECK(!o.hasValue("arr"));
+    BOOST_CHECK_THROW(o.get("arr"), std::exception);
 }
 
 BOOST_AUTO_TEST_CASE(object_attribute_starts_off_empty)
@@ -415,7 +413,7 @@ BOOST_AUTO_TEST_CASE(object_set_simplearray_attribute_value)
     Object myObject(myClass);
 
     std::shared_ptr<Object> arr = myObject.set("attr1", tArray<tBoolean>::value(2));
-    BOOST_CHECK_EQUAL(arr->asArray<tBoolean>()[0]->asBoolean(), false);
+    BOOST_CHECK_EQUAL(arr->asArray()[0]->asBoolean(), false);
 }
 
 BOOST_AUTO_TEST_CASE(object_get_simplearray_attribute_value)
@@ -425,10 +423,10 @@ BOOST_AUTO_TEST_CASE(object_get_simplearray_attribute_value)
     Object myObject(myClass);
 
     std::shared_ptr<Object> arr = myObject.set("attr1", tArray<tBoolean>::value(2));
-    arr->asArray<tBoolean>()[0]->asBoolean(true);
+    arr->asArray()[0]->asBoolean(true);
 
     std::shared_ptr<Object> arr2 = myObject.get("attr1");
-    BOOST_CHECK_EQUAL(arr2->asArray<tBoolean>()[0]->asBoolean(), true);
+    BOOST_CHECK_EQUAL(arr2->asArray()[0]->asBoolean(), true);
 }
 
 BOOST_AUTO_TEST_CASE(object_set_objectarray_attribute_value)
@@ -440,7 +438,7 @@ BOOST_AUTO_TEST_CASE(object_set_objectarray_attribute_value)
     Object myObject(myClass);
 
     std::shared_ptr<Object> arr = myObject.set("attr1", tObjectArray::value(c, 1));
-    BOOST_CHECK_EQUAL(arr->asObjectArray(c)[0]->get("a")->asInteger(), 0);
+    BOOST_CHECK_EQUAL(arr->asObjectArray()[0]->get("a")->asInteger(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(object_get_object_attribute_value)
@@ -452,8 +450,8 @@ BOOST_AUTO_TEST_CASE(object_get_object_attribute_value)
     Object myObject(myClass);
 
     std::shared_ptr<Object> arr = myObject.set("attr1", tObjectArray::value(c, 1));
-    arr->asObjectArray(c)[0]->get("a")->asInteger(5);
+    arr->asObjectArray()[0]->get("a")->asInteger(5);
 
     std::shared_ptr<Object> arr2 = myObject.get("attr1");
-    BOOST_CHECK_EQUAL(arr2->asObjectArray(c)[0]->get("a")->asInteger(), 5);
+    BOOST_CHECK_EQUAL(arr2->asObjectArray()[0]->get("a")->asInteger(), 5);
 }

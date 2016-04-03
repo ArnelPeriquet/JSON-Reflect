@@ -94,7 +94,7 @@ namespace webo {
 					Type & attribType = clazz.getAttributeType(*attribName);
 
 					if (attribType.isBuiltIn()) {
-						if (attribType.isArray())
+						if (attribType.isSimpleArray())
 							vAttribValue = createArray(*attribName, attribType, propTree);
 						else if (attribType.isObjectArray())
 							vAttribValue = createObjectArray(*attribName, attribType, propTree, allowMissingAttributes);

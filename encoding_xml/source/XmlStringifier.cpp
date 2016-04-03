@@ -38,8 +38,8 @@ namespace webo {
 
 	namespace encoding_xml {
 
-		XmlStringifier::XmlStringifier(ClassModel & iClassModel)
-			: mClassModel(iClassModel), mIndentation(0) {
+		XmlStringifier::XmlStringifier(ClassModel & classModel)
+			: mClassModel(classModel), mIndentation(0) {
 		}
 
 		void XmlStringifier::indent(std::stringstream & ss) const {
@@ -47,83 +47,97 @@ namespace webo {
 				ss << " ";
 		}
 
-		bool XmlStringifier::isAttribute(std::string & iAttribName) {
-			return iAttribName.length() > 0 && iAttribName.at(0) == XML_ATTRIB_INDICATOR;
+		bool XmlStringifier::isAttribute(std::string & attribName) {
+			return attribName.length() > 0 && attribName.at(0) == XML_ATTRIB_INDICATOR;
 		}
 
-		bool XmlStringifier::isDirectNode(std::string & iAttribName) {
-			return iAttribName.length() > 0 && iAttribName.at(0) == XML_DIRECT_NODE_INDICATOR;
+		bool XmlStringifier::isDirectNode(std::string & attribName) {
+			return attribName.length() > 0 && attribName.at(0) == XML_DIRECT_NODE_INDICATOR;
 		}
 
-		std::string XmlStringifier::stringify(Object & iObject, Class & iClass, bool iAllowMissingAttributes) {
+		std::string XmlStringifier::stringify(Object & object, Class & clazz, bool allowMissingAttributes) {
 			std::stringstream ss;
-			stringifyObject(ss, iObject, iClass, iAllowMissingAttributes);
+			stringifyObject(ss, object, clazz, allowMissingAttributes);
 			return ss.str();
 		}
 
-		void XmlStringifier::stringifyObject(std::stringstream & ss, Object & iObject, Class & iClass, bool iAllowMissingAttributes) {
-			ss << "<" << iClass.name;
-			stringifyAttributes(ss, iObject, iClass, iAllowMissingAttributes);
+		void XmlStringifier::stringifyObject(std::stringstream & ss, Object & object, Class & clazz, bool allowMissingAttributes) {
+			ss << "<" << clazz.name;
+			stringifyAttributes(ss, object, clazz, allowMissingAttributes);
 			ss << ">";
 
 			ss << "\n";
 			mIndentation++;
 			indent(ss);
 
-			stringifyNodes(ss, iObject, iClass, iAllowMissingAttributes);
+			stringifyNodes(ss, object, clazz, allowMissingAttributes);
 
 			ss << "\n";
 			mIndentation--;
 			indent(ss);
 
-			ss << "</" << iClass.name << ">";
+			ss << "</" << clazz.name << ">";
 		}
 
-		void XmlStringifier::stringifyAttributes(std::stringstream & ss, Object & iObject, Class & iClass, bool iAllowMissingAttributes) {
-			std::vector<std::string> & vAttribNames = iClass.getAttributeNames();
+		void XmlStringifier::stringifyAttributes(std::stringstream & ss, Object & object, Class & clazz, bool allowMissingAttributes) {
+			std::vector<std::string> & attribNames = clazz.getAttributeNames();
 
-			for (std::vector<std::string>::iterator vAttribName = vAttribNames.begin(); vAttribName != vAttribNames.end(); ++vAttribName) {
-				if (!iAllowMissingAttributes && !iObject.hasValue(*vAttribName))
-					throw std::runtime_error("object is missing value, name=" + *vAttribName);
+			for (auto attribName: attribNames) {
+				if (!allowMissingAttributes && !object.hasValue(attribName))
+					throw std::runtime_error("object is missing value, name=" + attribName);
 
-				if (isAttribute(*vAttribName) && iObject.hasValue(*vAttribName)) {
-					std::shared_ptr<Object> vAttribValue = iObject.get(*vAttribName);
-					Type &  vAttribType = vAttribValue->type;
-					ss << " " << vAttribName->substr(1) << "=\"";
-					stringifyText(ss, *vAttribValue, vAttribType);
+				if (isAttribute(attribName) && object.hasValue(attribName)) {
+					std::shared_ptr<Object> attribValue = object.get(attribName);
+					Type &  vAttribType = attribValue->type;
+					ss << " " << attribName.substr(1) << "=\"";
+					stringifyText(ss, *attribValue, vAttribType);
                     ss << "\"";
 				}
 			}
 		}
 
-		void XmlStringifier::stringifyNodes(std::stringstream & ss, Object & iObject, Class & iClass, bool iAllowMissingAttributes) {
-			std::vector<std::string> vNodeNames;
-			extractNodes(vNodeNames, iObject, iClass, iAllowMissingAttributes);
+		void XmlStringifier::stringifyNodes(std::stringstream & ss, Object & object, Class & clazz, bool allowMissingAttributes) {
+			std::vector<std::string> nodeNames;
+			extractNodes(nodeNames, object, clazz, allowMissingAttributes);
 
-			for (std::vector<std::string>::iterator vNodeName = vNodeNames.begin(); vNodeName != vNodeNames.end(); ++vNodeName) {
-				std::shared_ptr<Object> vNodeValue = iObject.get(*vNodeName);
+            size_t length = nodeNames.size();
+            size_t count = 0;
 
-				if (vNodeValue->type.isBuiltIn())
-					stringifyDirectNodeOrFreeText(ss, *vNodeName, *vNodeValue);
-				else
-					stringifyNestedNode(ss, *vNodeValue, iAllowMissingAttributes);
+			for (auto nodeName: nodeNames) {
+				std::shared_ptr<Object> nodeValue = object.get(nodeName);
 
-				if (vNodeName + 1 != vNodeNames.end()) {
+                Type & type = nodeValue->type;
+
+                if (type.isSimpleArray()) {
+                    ; // ignored cause it doesn't make sense to have an array of unnamed nodes in XML
+                } else if (type.isObjectArray()) {
+                    std::shared_ptr<Object> * arr = nodeValue->asObjectArray();
+
+                    for (size_t i = 0; i < nodeValue->getObjectArrayLength(); i++) {
+                        stringifyNestedNode(ss, *arr[i], allowMissingAttributes);
+                    }
+                }  else if (type.isBuiltIn()) {
+                    stringifyDirectNodeOrFreeText(ss, nodeName, *nodeValue);
+                } else {
+                    stringifyNestedNode(ss, *nodeValue, allowMissingAttributes);
+                }
+
+				if (count++ < length-1) {
 					ss << "\n";
 					indent(ss);
 				}
 			}
 		}
 
-		void XmlStringifier::extractNodes(std::vector<std::string> & oNodeNames, Object & iObject, Class & iClass, bool iAllowMissingAttributes) {
-			std::vector<std::string> & vAttribNames = iClass.getAttributeNames();
+		void XmlStringifier::extractNodes(std::vector<std::string> & oNodeNames, Object & object, Class & clazz, bool allowMissingAttributes) {
+			std::vector<std::string> & attribNames = clazz.getAttributeNames();
 
-			for (std::vector<std::string>::iterator vAttribName = vAttribNames.begin(); vAttribName != vAttribNames.end(); ++vAttribName) {
-				if (!iAllowMissingAttributes && !iObject.hasValue(*vAttribName))
-					throw std::runtime_error("object is missing value, name=" + *vAttribName);
+			for (auto attribName: attribNames) {
+				if (!allowMissingAttributes && !object.hasValue(attribName))
+					throw std::runtime_error("object is missing value, name=" + attribName);
 
-				if (!isAttribute(*vAttribName) && iObject.hasValue(*vAttribName))
-					oNodeNames.push_back(*vAttribName);
+				if (!isAttribute(attribName) && object.hasValue(attribName))
+					oNodeNames.push_back(attribName);
 			}
 		}
 
@@ -138,26 +152,26 @@ namespace webo {
 			}
 		}
 
-		void XmlStringifier::stringifyNestedNode(std::stringstream & ss, Object & iValue, bool iAllowMissingAttributes) {
-			Class * vClass = dynamic_cast<Class *>(&(iValue.type));
+		void XmlStringifier::stringifyNestedNode(std::stringstream & ss, Object & iValue, bool allowMissingAttributes) {
+			Class * clazz = dynamic_cast<Class *>(&(iValue.type));
 
-			if (vClass)
-				stringifyObject(ss, iValue, *vClass, iAllowMissingAttributes);
+			if (clazz)
+				stringifyObject(ss, iValue, *clazz, allowMissingAttributes);
 			else
 				throw std::runtime_error("attempt to convert a non-class to a class, type=" + iValue.type.name);
 		}
 
-		void XmlStringifier::stringifyText(std::stringstream & ss, Object & iObject, Type & type) {
+		void XmlStringifier::stringifyText(std::stringstream & ss, Object & object, Type & type) {
 			if (type == tCharacter::instance())
-				ss << iObject.asCharacter();
+				ss << object.asCharacter();
 			else if (type == tInteger::instance())
-				ss << iObject.asInteger();
+				ss << object.asInteger();
             else if (type == tFloat::instance())
-                ss << iObject.asFloat();
+                ss << object.asFloat();
 			else if (type == tString::instance())
-				ss << iObject.asString();
+				ss << object.asString();
 			else if (type == tBoolean::instance())
-				ss << (iObject.asBoolean() ? "true" : "false");
+				ss << (object.asBoolean() ? "true" : "false");
 			else if (type == tNull::instance())
 				ss << "null";
 			else
