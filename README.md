@@ -9,3 +9,7 @@ Benefits
 - Object API for JSON parsing and generation (JSON.Stringify(), JSON.Parse())
 - Object API for generating XML (XML.Stringify())
 - JSON-based Class schema and ClassLoader
+
+Build Note:
+
+- Out of the box, the projects assume ../third_party/boost_1.59.0 is installed.
